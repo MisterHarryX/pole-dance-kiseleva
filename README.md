@@ -39,12 +39,27 @@ npm run photos     # пересобрать фото из _source/ в public/pho
 
 Что где хранится: правки — ключ `pdk:content`, заявки — `pdk:requests`, счётчики — `pdk:stat:*`, фото — Vercel Blob (если задан `BLOB_READ_WRITE_TOKEN`), иначе Redis / `.data/media`. Все ключи начинаются с `pdk:`, поэтому общая база Redis с другими проектами не смешивается.
 
-## Публикация на Vercel
+## Где сайт в интернете
 
-1. Создать проект на Vercel из этой папки (`vercel` или через GitHub).
-2. В Storage подключить Upstash Redis (переменные `KV_REST_API_URL`, `KV_REST_API_TOKEN` появятся сами), по желанию — Vercel Blob для фото.
-3. В Environment Variables задать `ADMIN_PASSWORD` (и `ADMIN_SECRET`).
-4. Без Redis сайт работает, но форма заявок и кабинет скажут, что хранилище не подключено.
+- **Сайт (временно):** https://misterharryx.github.io/pole-dance-kiseleva/ — статичная копия на GitHub Pages (ветка `gh-pages`). Своего сервера у неё нет: содержимое, заявки и счётчики она берёт с Vercel (`VITE_API_BASE` в `.env.pages`).
+- **Кабинет и API:** https://pole-dance-kiseleva.vercel.app/admin — проект `pole-dance-kiseleva` на Vercel (команда `writelite`). Там же полная копия сайта.
+- **Вход в кабинет:** золотой ключик в самом низу сайта; `/admin` на GitHub Pages тоже ведёт туда.
+- **Код:** https://github.com/MisterHarryX/pole-dance-kiseleva (открытый; пароли и данные в репозиторий не попадают).
+- **Пароль кабинета** — переменная `ADMIN_PASSWORD` в настройках проекта на Vercel (локально — `.env.local`).
+- **База:** общая Upstash Redis команды (`icg-statistics`), данные этого сайта — только ключи `pdk:*`.
+
+### Как обновить
+
+```bash
+vercel deploy --prod --scope writelite   # кабинет, API и копия сайта на Vercel
+npm run deploy:pages                     # копия сайта на GitHub Pages
+```
+
+Тексты и цены, изменённые в кабинете, видны на обеих копиях сразу, без пересборки.
+
+### Перенос на свой домен
+
+Когда появится домен: подключить его к проекту на Vercel (там весь сайт с кабинетом) и добавить домен в `SITE_ORIGINS`, если копия на GitHub Pages останется.
 
 ## Где что менять в коде
 
