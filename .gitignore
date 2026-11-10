@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-pages
+.data
+.vercel
+# Secrets stay local; the example and the Pages build settings hold none.
+.env*
+!.env.example
+!.env.pages
