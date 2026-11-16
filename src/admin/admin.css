@@ -2142,7 +2142,12 @@ html[data-dragging] * {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .a-top__tools .a-btn--ghost {
+  /* On a phone the editor link stays, as an icon. */
+  .a-top__edit {
+    padding-inline: 0.7rem;
+  }
+
+  .a-top__label {
     display: none;
   }
 }

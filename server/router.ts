@@ -15,7 +15,7 @@ import {
 import { MAX_UPLOAD, acceptedType, getOverrides, readMedia, saveOverrides, saveUpload } from './data.js';
 import { adminConfigured, env } from './env.js';
 import { analyticsEnabled, deviceInfo, geoFromHeaders, recordEvent, visitorId } from './events.js';
-import { allowedOrigin, clientIp, cookie, error, json, noContent, rateLimiter, readJsonBody, sameOrigin, siteHost, siteOriginHosts } from './http.js';
+import { allowedOrigin, clientIp, cookie, error, json, noContent, rateLimiter, readCookie, readJsonBody, sameOrigin, siteHost, siteOriginHosts } from './http.js';
 import { readLogins, recordLogin } from './logins.js';
 import { createRequest, deleteRequest, listRequests, updateRequest } from './requests.js';
 import { getLiveCount, getStats, isRangeId } from './stats.js';
@@ -240,6 +240,13 @@ async function admin(request: Request, parts: string[]): Promise<Response> {
   }
   if (section === 'session' && method === 'GET') {
     const signedIn = isAdminRequest(request);
+    // Sessions opened before the on-site editor existed have no hint cookie:
+    // give it back, so "Редактировать сайт" works without signing in again.
+    const headers = new Headers();
+    if (signedIn && readCookie(request, UI_COOKIE) !== '1') {
+      const expires = Number(readCookie(request, SESSION_COOKIE)?.split('.')[0]);
+      headers.append('Set-Cookie', cookie(UI_COOKIE, '1', { expires: new Date(expires), secure }));
+    }
     return json({
       authenticated: signedIn,
       configured: adminConfigured(),
@@ -247,7 +254,7 @@ async function admin(request: Request, parts: string[]): Promise<Response> {
       blob: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
       analytics: analyticsEnabled(),
       tz: env.tz,
-    });
+    }, { headers });
   }
 
   if (!isAdminRequest(request)) return error('unauthorized', 401);

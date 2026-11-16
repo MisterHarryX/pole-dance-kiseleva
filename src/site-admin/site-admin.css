@@ -29,6 +29,11 @@
   color: inherit;
 }
 
+/* While the editing toolbar is up, the phone's call / book bar steps aside for it. */
+body:has(.sa-bar) .mobile-bar {
+  display: none;
+}
+
 /* Edit mode: whatever can be edited shows a hand. */
 html[data-site-hover],
 html[data-site-hover] * {

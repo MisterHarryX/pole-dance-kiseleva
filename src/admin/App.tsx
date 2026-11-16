@@ -176,8 +176,13 @@ function Shell({ onLogout }: { onLogout: () => void }) {
             <button type="button" className="a-btn a-btn--primary a-btn--sm" onClick={() => open('new')}>
               <AdminIcon name="plus" size={16} /> Заявка
             </button>
-            <a className="a-btn a-btn--ghost a-btn--sm" href="/?edit" title="Открыть сайт в режиме правки: клик по любому тексту или фото">
-              <AdminIcon name="content" size={15} /> Редактировать сайт
+            <a
+              className="a-btn a-btn--ghost a-btn--sm a-top__edit"
+              href="/?edit"
+              aria-label="Редактировать сайт"
+              title="Открыть сайт в режиме правки: клик по любому тексту или фото"
+            >
+              <AdminIcon name="content" size={15} /> <span className="a-top__label">Редактировать сайт</span>
             </a>
           </div>
         </header>
