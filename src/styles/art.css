@@ -112,6 +112,15 @@ html:not(.js-reveal) .heading__title .w > span {
 .hero__frame .xfade {
   border-radius: 18px;
 }
+.hero__frame .xfade img {
+  scale: 1.05;
+  filter: blur(7px) grayscale(0.25) brightness(0.83);
+}
+.hero__frame .xfade img[data-state='on'] {
+  animation-name: kenburns;
+  animation-duration: var(--xfade-ms);
+  animation-timing-function: linear;
+}
 .hero__deco {
   position: absolute;
   z-index: 1;
@@ -263,7 +272,7 @@ html:not(.js-reveal) .heading__title .w > span {
 
 /* ——— Gallery: vertical ring + wide filmstrip ——— */
 .orbit {
-  --radius: 400px;
+  --radius: 150px;
   --card-w: 210px;
   height: 560px;
 }
@@ -273,7 +282,7 @@ html:not(.js-reveal) .heading__title .w > span {
 }
 @media (max-width: 720px) {
   .orbit {
-    --radius: 250px;
+    --radius: 100px;
     --card-w: 140px;
     height: 420px;
   }
@@ -282,10 +291,12 @@ html:not(.js-reveal) .heading__title .w > span {
   margin-top: clamp(40px, 6vw, 72px);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  margin-inline: auto;
   gap: 16px;
 }
 .filmstrip__item {
   position: relative;
+  aspect-ratio: 3 / 2;
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow:
@@ -315,6 +326,9 @@ html:not(.js-reveal) .heading__title .w > span {
 @media (max-width: 720px) {
   .filmstrip {
     grid-template-columns: 1fr;
+  }
+  .filmstrip__item {
+    aspect-ratio: var(--photo-ratio);
   }
 }
 

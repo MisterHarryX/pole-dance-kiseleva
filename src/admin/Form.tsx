@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { api, errorText, shrinkImage } from './api.ts';
+import { adminApi, errorText, shrinkImage } from './api.ts';
 import { getAt, setAt, type Field } from './schema.ts';
 
 type Obj = Record<string, unknown>;
@@ -51,9 +51,9 @@ function FieldView({ field, value, onChange }: { field: Field; value: unknown; o
       );
     case 'toggle':
       return (
-        <label className="a-toggle">
+        <label className="a-switch">
           <input type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} />
-          <span className="a-toggle__track" aria-hidden="true" />
+          <span className="a-switch__track" aria-hidden="true" />
           <span>{field.label}</span>
         </label>
       );
@@ -174,7 +174,7 @@ function ImageField({ field, value, onChange }: { field: Extract<Field, { kind: 
     setProblem('');
     try {
       const { blob, w, h } = await shrinkImage(file, field.round ? 600 : 1600);
-      const { url } = await api.upload(blob);
+      const { url } = await adminApi.upload(blob);
       onChange(field.shape === 'photo' ? { ...((value as Obj) ?? {}), src: url, w, h, alt: (value as Obj | undefined)?.alt ?? file.name } : url);
     } catch (e) {
       setProblem(errorText(e));
@@ -189,7 +189,7 @@ function ImageField({ field, value, onChange }: { field: Extract<Field, { kind: 
       <div className="a-image">
         <span className={`a-image__preview ${field.round ? 'is-round' : ''}`}>{src ? <img src={src} alt="" /> : <em>нет фото</em>}</span>
         <span className="a-image__tools">
-          <button type="button" className="a-btn a-btn--ghost" onClick={() => input.current?.click()} disabled={busy}>
+          <button type="button" className="a-btn a-btn--ghost a-btn--sm" onClick={() => input.current?.click()} disabled={busy}>
             {busy ? 'Загружаем…' : src ? 'Заменить фото' : 'Загрузить фото'}
           </button>
           {src && field.shape === 'url' && (

@@ -1,0 +1,59 @@
+/* ——— Wordmark: the hand-drawn logo; letters in the text colour, the pole in gold ——— */
+/* :where() keeps the default size at zero specificity, so any class can set --wm-w */
+:where(.wordmark) {
+  --wm-w: 128px;
+}
+.wordmark {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  width: var(--wm-w);
+  aspect-ratio: 640 / 288;
+  color: var(--fg, #eceae5);
+}
+.wordmark--full {
+  aspect-ratio: 1051 / 846;
+}
+:where(.wordmark--large) {
+  --wm-w: 230px;
+}
+:where(.wordmark--full.wordmark--large) {
+  --wm-w: 210px;
+}
+.wordmark__letters,
+.wordmark__glow,
+.wordmark__pole {
+  position: absolute;
+  inset: 0;
+}
+.wordmark__letters {
+  background: currentColor;
+  -webkit-mask: var(--wm-letters) center / 100% 100% no-repeat;
+  mask: var(--wm-letters) center / 100% 100% no-repeat;
+}
+/* the glow sits on a wrapper: a filter on the masked element itself would be cut off by the mask */
+.wordmark__glow {
+  filter: drop-shadow(0 0 clamp(3px, 0.65vw, 9px) rgba(231, 207, 149, 0.55));
+}
+.wordmark__pole {
+  background:
+    linear-gradient(180deg, transparent 0 42%, rgba(255, 255, 255, 0.95) 50%, transparent 58% 100%) 0 var(--glint, -100%) / 100% 300% no-repeat,
+    linear-gradient(180deg, #f2dfa9, #d6b673 30%, #c8a25a 60%, #8e6c2f);
+  -webkit-mask: var(--wm-pole) center / 100% 100% no-repeat;
+  mask: var(--wm-pole) center / 100% 100% no-repeat;
+  animation: pole-glint 4.5s var(--ease-in-out, cubic-bezier(0.65, 0, 0.35, 1)) infinite;
+}
+@keyframes pole-glint {
+  0%,
+  55% {
+    background-position: 0 -100%, 0 0;
+  }
+  100% {
+    background-position: 0 200%, 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wordmark__pole {
+    animation: none;
+  }
+}

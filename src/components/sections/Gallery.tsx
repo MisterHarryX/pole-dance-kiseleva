@@ -1,4 +1,4 @@
-import { useEffect, useRef, type PointerEvent } from 'react';
+import { useEffect, useRef, type CSSProperties, type PointerEvent } from 'react';
 import { photos } from '../../config/site.ts';
 import { useInView } from '../../hooks/useInView.ts';
 import { useReducedMotion } from '../../hooks/useReducedMotion.ts';
@@ -8,11 +8,9 @@ import { Icon } from '../ui/Icon.tsx';
 import { useLightbox } from '../ui/Lightbox.tsx';
 
 // The ring takes the vertical shots (all 851×1280, the card's own proportions); wide ones go to the strip below.
-const shots = [photos.inverted, photos.lean, photos.white, photos.leanRed, photos.split];
-const ringShots = [...shots, ...shots]; // twice round the pole, so the ring looks full
-
-const wide = [photos.flag, photos.crouch, photos.crouchRed];
-const STEP = 360 / ringShots.length;
+const shots = [photos.inverted, photos.lean, photos.white, photos.split];
+const wide = [photos.flag, photos.crouch, photos.hall4];
+const STEP = 360 / shots.length;
 
 /**
  * Photos orbit the central pole in 3D. Drag (mouse or finger) to spin with inertia;
@@ -98,7 +96,7 @@ export function Gallery() {
               Сила, которая <em className="gold-text">выглядит</em> легко
             </>
           }
-          lead="Кадры из фотосессии студии. Покрутите карусель вокруг пилона и нажмите на фото, чтобы открыть его целиком."
+          lead="Кадры с пилона и фото зала. Покрутите карусель и нажмите на фото, чтобы открыть его целиком."
           align="center"
           id="gallery-title"
         />
@@ -116,15 +114,15 @@ export function Gallery() {
         <div className="orbit__floor" aria-hidden="true" />
         <div className="orbit__scene">
           <div ref={ring} className="orbit__ring">
-            {ringShots.map((ph, i) => (
+            {shots.map((ph, i) => (
               <button
-                key={`${ph.src}-${i}`}
+                key={ph.src}
                 type="button"
                 className="orbit__card"
                 style={{ transform: `rotateY(${i * STEP}deg) translateZ(var(--radius))` }}
                 onClick={() => {
                   if (s.current.moved > 8) return;
-                  openLightbox(shots, i % shots.length);
+                  openLightbox(shots, i);
                 }}
                 aria-label={`Открыть фото: ${ph.alt}`}
               >
@@ -153,7 +151,7 @@ export function Gallery() {
               key={ph.src}
               type="button"
               className="filmstrip__item"
-              style={{ aspectRatio: `${ph.w} / ${ph.h}` }}
+              style={{ '--photo-ratio': `${ph.w} / ${ph.h}` } as CSSProperties}
               onClick={() => openLightbox(wide, i)}
               aria-label={`Открыть фото: ${ph.alt}`}
               data-reveal

@@ -7,6 +7,7 @@ import { Heading } from '../ui/Heading.tsx';
 import { Icon } from '../ui/Icon.tsx';
 import { useLightbox } from '../ui/Lightbox.tsx';
 import { PhotoStage } from '../ui/PhotoStage.tsx';
+import { asset } from '../../lib/paths.ts';
 
 const L = 1;
 
@@ -64,20 +65,16 @@ function NeonSign({ lit }: { lit: boolean }) {
           </feMerge>
         </filter>
       </defs>
+      {/* the hand-drawn logo, lit through masks: letters and pole glow in different tones */}
+      <mask id="neon-letters" maskUnits="userSpaceOnUse" x="0" y="0" width="440" height="170">
+        <image href={asset('/brand/logo-letters-compact.png')} x="50" y="10" width="340" height="153" />
+      </mask>
+      <mask id="neon-pole" maskUnits="userSpaceOnUse" x="0" y="0" width="440" height="170">
+        <image href={asset('/brand/logo-pole-compact.png')} x="50" y="10" width="340" height="153" />
+      </mask>
       <g className="neon__tubes" filter={lit ? 'url(#neon-glow)' : undefined}>
-        <text x="200" y="74" textAnchor="end" className="neon__text">
-          Po
-        </text>
-        <text x="216" y="74" className="neon__text">
-          eDance
-        </text>
-        <text x="200" y="138" textAnchor="end" className="neon__text">
-          K
-        </text>
-        <text x="216" y="138" className="neon__text">
-          seleva
-        </text>
-        <path className="neon__bar" d="M208 16V158" />
+        <rect className="neon__text" x="0" y="0" width="440" height="170" mask="url(#neon-letters)" />
+        <rect className="neon__bar" x="0" y="0" width="440" height="170" mask="url(#neon-pole)" />
       </g>
       {/* крепления и провод */}
       <g className="neon__mount">

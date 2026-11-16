@@ -4,6 +4,7 @@ import { DecoArch, DecoCorners, Sunburst } from '../ui/Art.tsx';
 import { useInView } from '../../hooks/useInView.ts';
 import { useReducedMotion } from '../../hooks/useReducedMotion.ts';
 import { Icon } from '../ui/Icon.tsx';
+import { Wordmark } from '../ui/Wordmark.tsx';
 import { CountUp, Crossfade, GlowWord } from '../ui/Motion.tsx';
 
 /** Slowly rising gold dust on a canvas; pauses offscreen and under reduced motion. */
@@ -68,6 +69,10 @@ function GoldDust() {
   return <canvas ref={canvas} className="hero__dust" aria-hidden="true" />;
 }
 
+const heroSlides = [photos.inverted, photos.white, photos.split, photos.lean];
+// The same photos, small and blurred, fill the whole first screen behind the text.
+const backdrop = heroSlides.map((ph) => ({ ...ph, src: ph.src.replace('.webp', '-sm.webp'), alt: '' }));
+
 export function Hero() {
   const onMove = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType !== 'mouse') return;
@@ -80,24 +85,23 @@ export function Hero() {
 
   return (
     <section className="hero" id="top" onPointerMove={onMove} aria-labelledby="hero-title">
+      <div className="hero__backdrop" aria-hidden="true">
+        <Crossfade slides={backdrop} priority ms={4600} />
+      </div>
       <GoldDust />
       <div className="hero__glow" aria-hidden="true" />
       <div className="hero__pole" aria-hidden="true" />
 
       <div className="container hero__grid">
         <div className="hero__copy">
-          <p className="eyebrow hero__eyebrow">
-            <span className="eyebrow__tick" aria-hidden="true" />
-            {hero.eyebrow}
-          </p>
           <h1 className="hero__title" id="hero-title">
-            <span className="hero__line">
-              <span>Pole Dance</span>
-            </span>
-            <span className="hero__line hero__line--gold">
-              <span className="gold-text">Kiseleva</span>
-            </span>
+            <Wordmark className="hero__logo" variant="full" />
+            <span className="hero__kicker">{hero.kicker}</span>
           </h1>
+          <p className="hero__place">
+            <Icon name="metro" size={15} />
+            {hero.place}
+          </p>
           <p className="hero__tagline">
             Танец, в котором вы становитесь <GlowWord words={hero.words} />
           </p>
@@ -135,7 +139,7 @@ export function Hero() {
           <Sunburst className="hero__sunburst" />
           <DecoArch className="hero__deco" />
           <div className="hero__frame" style={{ aspectRatio: ratio(photos.inverted) }}>
-            <Crossfade slides={[photos.inverted, photos.white, photos.split, photos.lean]} priority ms={4600} />
+            <Crossfade slides={heroSlides} priority ms={4600} />
             <DecoCorners />
           </div>
           <a className="hero__badge" href={contacts.yandexReviews} target="_blank" rel="noopener noreferrer">

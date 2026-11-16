@@ -1,4 +1,10 @@
-import type { CallbackRequest, ContentOverrides, DayStats, RequestStatus } from '../../shared/content.ts';
+import type { LoginEntry, RangeId, Stats } from '../../shared/analytics.ts';
+import type { BookingRequest, RequestPatch } from '../../shared/booking.ts';
+import type { ContentOverrides } from '../../shared/content.ts';
+
+/** Panel calls to /api/admin/* (as in ISPANA). A 401 anywhere means the session ended. */
+
+export class Unauthorized extends Error {}
 
 export class ApiError extends Error {
   constructor(
@@ -10,31 +16,42 @@ export class ApiError extends Error {
 }
 
 async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`/api/${path}`, { credentials: 'same-origin', ...init });
+  const response = await fetch(`/api/${path}`, {
+    cache: 'no-store',
+    credentials: 'same-origin',
+    ...init,
+    headers: typeof init.body === 'string' ? { 'Content-Type': 'application/json', ...init.headers } : init.headers,
+  });
+  if (response.status === 401 && path !== 'admin/login') throw new Unauthorized('unauthorized');
   if (response.status === 204) return undefined as T;
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new ApiError((data as { error?: string }).error ?? 'server', response.status);
-  return data as T;
+  const body = (await response.json().catch(() => ({}))) as T & { error?: string };
+  if (!response.ok) throw new ApiError(body.error ?? 'server', response.status);
+  return body;
 }
 
-const jsonInit = (method: string, body: unknown): RequestInit => ({
-  method,
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(body),
-});
+export type { LoginEntry };
 
-export type Session = { authenticated: boolean; configured: boolean; storage: 'redis' | 'files' | 'none'; blob: boolean };
+export interface Status {
+  backend: 'redis' | 'files' | 'none';
+  media: 'blob' | 'redis' | 'files' | 'none';
+  tz: string;
+  analytics: boolean;
+}
 
-export const api = {
-  session: () => call<Session>('admin/session'),
-  login: (password: string) => call<{ ok: true }>('admin/login', jsonInit('POST', { password })),
+export const adminApi = {
+  session: () => call<{ authenticated: boolean; configured: boolean }>('admin/session'),
+  login: (password: string) => call<{ ok: true }>('admin/login', { method: 'POST', body: JSON.stringify({ password }) }),
   logout: () => call<{ ok: true }>('admin/logout', { method: 'POST' }),
+  status: () => call<Status>('admin/status'),
+  requests: () => call<{ items: BookingRequest[]; now: number }>('admin/requests'),
+  create: (data: Record<string, unknown>) => call<{ item: BookingRequest }>('admin/requests', { method: 'POST', body: JSON.stringify(data) }),
+  patch: (id: string, patch: RequestPatch) => call<{ item: BookingRequest }>(`admin/requests/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
+  remove: (id: string) => call<{ ok: true }>(`admin/requests/${id}`, { method: 'DELETE' }),
+  stats: (range: RangeId) => call<Stats>(`admin/stats?range=${range}`),
+  live: () => call<{ live: number }>('admin/live'),
+  logins: () => call<{ items: LoginEntry[] }>('admin/logins'),
   content: () => call<ContentOverrides>('admin/content'),
-  saveContent: (overrides: ContentOverrides) => call<ContentOverrides>('admin/content', jsonInit('PUT', overrides)),
-  requests: () => call<CallbackRequest[]>('admin/requests'),
-  updateRequest: (id: string, patch: { status?: RequestStatus; note?: string }) => call<CallbackRequest>(`admin/requests/${id}`, jsonInit('PATCH', patch)),
-  deleteRequest: (id: string) => call<void>(`admin/requests/${id}`, { method: 'DELETE' }),
-  stats: (days: number) => call<DayStats[]>(`admin/stats?days=${days}`),
+  saveContent: (data: ContentOverrides) => call<ContentOverrides>('admin/content', { method: 'PUT', body: JSON.stringify(data) }),
   upload: (file: Blob) => call<{ url: string }>('admin/upload', { method: 'POST', headers: { 'Content-Type': file.type }, body: file }),
 };
 
@@ -52,17 +69,19 @@ export async function shrinkImage(file: File, max = 1400): Promise<{ blob: Blob;
   return { blob, w, h };
 }
 
-export function errorText(e: unknown) {
-  const code = e instanceof ApiError ? e.code : 'network';
-  const texts: Record<string, string> = {
-    wrong_password: 'Неверный пароль',
-    blocked: 'Слишком много попыток. Подождите 15 минут',
-    not_configured: 'Пароль кабинета не задан на сервере (ADMIN_PASSWORD)',
-    storage: 'Хранилище не подключено: на Vercel подключите Upstash Redis',
-    unauthorized: 'Сессия истекла — войдите снова',
-    type: 'Можно загрузить только JPG, PNG или WebP',
-    size: 'Файл слишком большой (до 4 МБ)',
-    network: 'Нет связи с сервером',
-  };
-  return texts[code] ?? 'Что-то пошло не так, попробуйте ещё раз';
+export const ERROR_TEXT: Record<string, string> = {
+  wrong_password: 'Пароль не подошёл.',
+  blocked: 'Слишком много попыток. Подождите пятнадцать минут.',
+  not_configured: 'Пароль не задан: добавьте ADMIN_PASSWORD в переменные окружения (локально — в файл .env.local).',
+  storage: 'Хранилище не подключено. Откройте «Настройки», там написано, что сделать.',
+  unauthorized: 'Сессия закончилась — войдите снова.',
+  invalid: 'Заполните имя.',
+  type: 'Можно загрузить только JPG, PNG или WebP.',
+  size: 'Файл слишком большой (до 4 МБ).',
+  network: 'Нет связи с сервером.',
+};
+
+export function errorText(cause: unknown) {
+  const code = cause instanceof ApiError || cause instanceof Unauthorized ? cause.message : 'network';
+  return ERROR_TEXT[code] ?? 'Что-то пошло не так, попробуйте ещё раз.';
 }

@@ -60,9 +60,10 @@ export const sections: Section[] = [
     key: 'hero',
     title: 'Первый экран',
     icon: 'star',
-    description: 'Подзаголовок, меняющиеся слова, описание и цифры под кнопками.',
+    description: 'Надпись под логотипом, меняющиеся слова, описание и цифры под кнопками.',
     fields: [
-      { kind: 'text', key: 'eyebrow', label: 'Надпись над названием' },
+      { kind: 'text', key: 'kicker', label: 'Надпись под логотипом' },
+      { kind: 'text', key: 'place', label: 'Где студия (строка под надписью)' },
       { kind: 'strings', key: 'words', label: 'Слова после «Танец, в котором вы становитесь…»', add: 'Добавить слово' },
       { kind: 'textarea', key: 'lead', label: 'Описание', rows: 4 },
       {

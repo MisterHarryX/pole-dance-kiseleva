@@ -65,6 +65,12 @@ export async function writeJsonAtomic(file: string, value: unknown) {
   await fs.rename(tmp, file);
 }
 
+/** Appends one line to a log file (analytics events, sign-ins). */
+export async function appendLine(file: string, line: string) {
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.appendFile(file, `${line}\n`, 'utf8');
+}
+
 /** Serialises read-modify-write cycles on one key within this process. */
 const locks = new Map<string, Promise<unknown>>();
 export function withLock<T>(key: string, task: () => Promise<T>): Promise<T> {

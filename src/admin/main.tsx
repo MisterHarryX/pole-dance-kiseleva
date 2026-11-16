@@ -6,10 +6,10 @@ import '@fontsource/manrope/400.css';
 import '@fontsource/manrope/500.css';
 import '@fontsource/manrope/600.css';
 import './admin.css';
-import { App } from './App.tsx';
+import { AdminApp } from './App.tsx';
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById('admin')!).render(
   <StrictMode>
-    <App />
+    <AdminApp />
   </StrictMode>,
 );

@@ -35,13 +35,15 @@ export function cookie(name: string, value: string, options: { expires?: Date; h
   return parts.join('; ');
 }
 
+/** The host the visitor sees. */
+export const siteHost = (request: Request) => request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+
 /** Rejects cross-site writes: when the browser sends an Origin, it must match the host. */
 export function sameOrigin(request: Request) {
   const origin = request.headers.get('origin');
   if (!origin) return true;
   try {
-    const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
-    return new URL(origin).host === host;
+    return new URL(origin).host === siteHost(request);
   } catch {
     return false;
   }
@@ -59,6 +61,10 @@ export function allowedOrigin(request: Request) {
   const extra = (process.env.SITE_ORIGINS ?? '').split(',').map((o) => o.trim().replace(/\/$/, ''));
   return SITE_ORIGINS.includes(origin) || extra.includes(origin) ? origin : null;
 }
+
+/** Hosts of the allowed copies of the site: their own pages are not "referrers". */
+export const siteOriginHosts = () =>
+  [...SITE_ORIGINS, ...(process.env.SITE_ORIGINS ?? '').split(',')].map((o) => o.trim().replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')).filter(Boolean);
 
 /** Parses a JSON body with a size cap; null when it is missing, too big or malformed. */
 export async function readJsonBody<T>(request: Request, maxBytes = 16_000): Promise<T | null> {

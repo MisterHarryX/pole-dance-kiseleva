@@ -1,5 +1,6 @@
 import { contacts, nav } from '../../config/site.ts';
 import { adminUrl } from '../../lib/paths.ts';
+import { ADMIN_OPEN_EVENT, hasAdminHint } from './AdminHost.tsx';
 import { Icon } from '../ui/Icon.tsx';
 import { Wordmark } from '../ui/Wordmark.tsx';
 
@@ -8,7 +9,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="container site-footer__grid">
         <div className="site-footer__brand">
-          <Wordmark large />
+          <Wordmark variant="full" large />
           <p>Студия танцев на пилоне в Новогиреево. Танцуем, растягиваемся и становимся сильнее.</p>
         </div>
         <nav className="site-footer__nav" aria-label="Разделы">
@@ -41,7 +42,18 @@ export function Footer() {
         <a href="#top">Наверх ↑</a>
       </div>
       <div className="site-footer__key">
-        <a href={adminUrl()} aria-label="Вход в кабинет студии" title="Кабинет студии" rel="nofollow">
+        <a
+          href={adminUrl()}
+          aria-label="Вход в кабинет студии"
+          title="Кабинет студии"
+          rel="nofollow"
+          onClick={(event) => {
+            // Signed in: the key brings back the editing toolbar instead of leaving the page.
+            if (!hasAdminHint()) return;
+            event.preventDefault();
+            window.dispatchEvent(new Event(ADMIN_OPEN_EVENT));
+          }}
+        >
           <Icon name="key" size={16} />
         </a>
       </div>

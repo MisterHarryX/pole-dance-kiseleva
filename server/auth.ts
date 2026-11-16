@@ -5,6 +5,8 @@ import { backend, redis, redisPipeline } from './store.js';
 
 /** httpOnly session cookie: the panel's credential. */
 export const SESSION_COOKIE = 'pdk_admin';
+/** Readable hint so the site can bring up the editing toolbar. Grants nothing by itself. */
+export const UI_COOKIE = 'pdk_admin_ui';
 const SESSION_DAYS = 14;
 
 const sign = (payload: string) => createHmac('sha256', env.adminSecret).update(payload).digest('base64url');

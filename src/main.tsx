@@ -20,19 +20,25 @@ import './styles/studio.css';
 import './styles/team.css';
 import './styles/extras.css';
 import { App } from './App.tsx';
-import { applyOverrides, loadOverrides } from './lib/content.ts';
+import { applyOverrides, loadOverrides, rememberPublished } from './lib/content.ts';
+import { hasPageEdits, setPageEdits } from './lib/liveLayer.ts';
 import { startTracking } from './lib/track.ts';
 
 /** Edits published in the panel are applied before the first paint; a slow API never holds the page long. */
 async function boot() {
   const overrides = await loadOverrides();
+  rememberPublished(overrides);
   if (overrides) applyOverrides(overrides);
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App />
     </StrictMode>,
   );
-  requestAnimationFrame(startTracking);
+  requestAnimationFrame(() => {
+    // Texts and photos changed right on the page are laid over the rendered site.
+    if (hasPageEdits(overrides?.page)) setPageEdits(overrides!.page);
+    startTracking();
+  });
 }
 
 void boot();

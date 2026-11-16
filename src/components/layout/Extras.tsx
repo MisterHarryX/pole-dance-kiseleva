@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { announcement } from '../../config/site.ts';
 import { useReducedMotion } from '../../hooks/useReducedMotion.ts';
 import { Icon } from '../ui/Icon.tsx';
+import { Wordmark } from '../ui/Wordmark.tsx';
 
 /** News card in the corner, edited in the panel. Dismissed for the rest of the visit. */
 export function Announcement() {
@@ -118,7 +119,7 @@ export function CursorRing() {
   return <div ref={ring} className="cursor-ring" aria-hidden="true" />;
 }
 
-/** One-second intro on the first visit of a session: the pole draws, the name appears. */
+/** Brief logo reveal on the first visit of a session. */
 export function Intro() {
   const [show] = useState(() => {
     try {
@@ -138,18 +139,7 @@ export function Intro() {
   if (!show || gone) return null;
   return (
     <div className="intro" aria-hidden="true">
-      <div className="intro__mark">
-        <span className="intro__l">
-          Po
-          <br />K
-        </span>
-        <span className="intro__pole" />
-        <span className="intro__r">
-          eDance
-          <br />
-          seleva
-        </span>
-      </div>
+      <Wordmark className="intro__mark" variant="full" />
     </div>
   );
 }

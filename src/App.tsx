@@ -1,4 +1,5 @@
 import { contacts, marquee } from './config/site.ts';
+import { AdminHost } from './components/layout/AdminHost.tsx';
 import { Announcement, ClickSparkles, CursorRing, Intro } from './components/layout/Extras.tsx';
 import { Footer } from './components/layout/Footer.tsx';
 import { Header } from './components/layout/Header.tsx';
@@ -46,6 +47,7 @@ export function App() {
       <Announcement />
       <ClickSparkles />
       <CursorRing />
+      <AdminHost />
     </LightboxProvider>
   );
 }

@@ -18,6 +18,14 @@ export const targets: Record<ContentKey, object> = {
   contacts: site.contacts,
 };
 
+/** site.ts as written in code, captured before any published edit is applied (the editor's "original"). */
+export const pristine = Object.fromEntries(Object.entries(targets).map(([k, v]) => [k, structuredClone(v)])) as Record<ContentKey, unknown>;
+
+let published: ContentOverrides | null = null;
+/** What the panel had published when the page loaded (the editor starts from it). */
+export const rememberPublished = (value: ContentOverrides | null) => (published = value);
+export const getPublished = () => published;
+
 const isObj = (v: unknown): v is Record<string, unknown> => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
 
 /**

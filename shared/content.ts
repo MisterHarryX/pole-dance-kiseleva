@@ -1,7 +1,8 @@
 /**
- * Shared between the site, the panel and the server: what can be edited in the panel,
- * callback requests and the counted events.
+ * Shared between the site, the panel and the server: what can be edited in the panel
+ * and what the «Перезвоните мне» form sends (requests themselves are in booking.ts).
  */
+import type { WorkHours } from './schedule.js';
 
 /** Sections of src/config/site.ts the panel may override. */
 export const CONTENT_KEYS = [
@@ -20,7 +21,37 @@ export const CONTENT_KEYS = [
 ] as const;
 
 export type ContentKey = (typeof CONTENT_KEYS)[number];
-export type ContentOverrides = Partial<Record<ContentKey, unknown>> & { updatedAt?: number };
+
+/** A photo the studio added to the page from the live editor, placed right after a block of text. */
+export interface Insert {
+  id: string;
+  /** Section id the anchor lives in ("studio", "faq"…). */
+  section: string;
+  /** Normalised text of the block the photo goes after. */
+  after: string;
+  src: string;
+  alt: string;
+}
+
+/**
+ * Edits made right on the page (the live editor), on top of the section overrides:
+ * - `free`: any wording not covered by a section, keyed "<area>::<original text>" → new text;
+ * - `media`: photo key (its original file without size or extension, see liveLayer) → new URL, "" hides it;
+ * - `inserts`: photos added after a block of text.
+ */
+export interface PageEdits {
+  free: Record<string, string>;
+  media: Record<string, string>;
+  inserts: Insert[];
+}
+export const EMPTY_PAGE: PageEdits = { free: {}, media: {}, inserts: [] };
+
+export type ContentOverrides = Partial<Record<ContentKey, unknown>> & {
+  page?: PageEdits;
+  /** Studio hours for the panel's schedule (Настройки). */
+  hours?: WorkHours;
+  updatedAt?: number;
+};
 
 export const isContentKey = (key: string): key is ContentKey => (CONTENT_KEYS as readonly string[]).includes(key);
 
@@ -35,24 +66,6 @@ export const TOPICS = [
 ] as const;
 export type TopicId = (typeof TOPICS)[number]['id'];
 export const topicLabel = (id: string) => TOPICS.find((t) => t.id === id)?.label ?? 'Другой вопрос';
-
-export const STATUSES = [
-  { id: 'new', label: 'Новые' },
-  { id: 'work', label: 'В работе' },
-  { id: 'done', label: 'Готово' },
-] as const;
-export type RequestStatus = (typeof STATUSES)[number]['id'];
-
-export type CallbackRequest = {
-  id: string;
-  ts: number;
-  name: string;
-  phone: string;
-  topic: TopicId;
-  comment?: string;
-  status: RequestStatus;
-  note?: string;
-};
 
 export type NewRequestPayload = {
   name: string;
@@ -79,11 +92,6 @@ export function formatPhone(phone: string) {
   if (d.length === 11 && d.startsWith('7')) return `+7 (${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7, 9)}-${d.slice(9)}`;
   return phone;
 }
-
-/** Events counted per day for the panel's statistics. */
-export const EVENTS = ['view', 'book', 'call', 'request'] as const;
-export type EventType = (typeof EVENTS)[number];
-export type DayStats = { day: string } & Record<EventType, number>;
 
 /** Links the panel may store: web, phone, mail or a path on this site. */
 export const safeUrl = (value: string) => /^(https?:\/\/|tel:|mailto:|\/(?!\/))/i.test(value.trim());
