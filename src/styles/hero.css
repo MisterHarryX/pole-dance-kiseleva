@@ -430,13 +430,13 @@
     justify-items: center;
   }
   .hero__logo {
-    --wm-w: min(66vw, 290px, 42svh);
+    --wm-w: min(58vw, 260px, 38svh);
   }
   .hero__kicker {
-    max-width: 21ch;
-    margin-top: 16px;
-    font-size: clamp(22px, 6.2vw, 27px);
-    line-height: 1.25;
+    max-width: 20ch;
+    margin-top: 18px;
+    font-size: clamp(25px, 7.4vw, 32px);
+    line-height: 1.22;
   }
   .hero__copy :is(.hero__logo, .hero__place, .hero__tagline, .hero__lead, .hero__cta, .hero__fine, .hero__stats) {
     animation: none;
