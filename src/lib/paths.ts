@@ -1,7 +1,7 @@
 /**
  * The same code builds two copies of the site:
  * - Vercel: files at the root, the API and the panel next to the page;
- * - GitHub Pages (misterharryx.github.io/pole-dance-kiseleva/): files under a sub-folder and no
+ * - GitHub Pages (poledance-kiseleva.ru): the same files at the root, but no
  *   server of its own, so requests, edits and the panel live on the Vercel copy (VITE_API_BASE).
  */
 const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/$/, '');

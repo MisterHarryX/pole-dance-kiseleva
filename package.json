@@ -9,7 +9,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "photos": "python -I scripts/photos.py",
-    "build:pages": "tsc && vite build --mode pages --base /pole-dance-kiseleva/ --outDir dist-pages --emptyOutDir",
+    "build:pages": "tsc && vite build --mode pages --base / --outDir dist-pages --emptyOutDir",
     "deploy:pages": "npm run build:pages && node scripts/deploy-pages.mjs"
   },
   "dependencies": {

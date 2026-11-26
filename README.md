@@ -50,7 +50,7 @@ npm run photos     # пересобрать фото из _source/ в public/pho
 
 ## Где сайт в интернете
 
-- **Сайт (временно):** https://misterharryx.github.io/pole-dance-kiseleva/ — статичная копия на GitHub Pages (ветка `gh-pages`). Своего сервера у неё нет: содержимое, заявки и счётчики она берёт с Vercel (`VITE_API_BASE` в `.env.pages`).
+- **Сайт:** https://poledance-kiseleva.ru — статичная копия на GitHub Pages (ветка `gh-pages`, домен в файле `CNAME`, DNS — в панели хостинга reg.ru). Своего сервера у неё нет: содержимое, заявки и счётчики она берёт с Vercel (`VITE_API_BASE` в `.env.pages`).
 - **Кабинет и API:** https://pole-dance-kiseleva.vercel.app/admin — проект `pole-dance-kiseleva` на Vercel (команда `writelite`). Там же полная копия сайта.
 - **Вход в кабинет:** золотой ключик в самом низу сайта; `/admin` на GitHub Pages тоже ведёт туда.
 - **Код:** https://github.com/MisterHarryX/pole-dance-kiseleva (открытый; пароли и данные в репозиторий не попадают).
@@ -68,7 +68,7 @@ npm run deploy:pages                     # копия сайта на GitHub Pag
 
 ### Перенос на свой домен
 
-Когда появится домен: подключить его к проекту на Vercel (там весь сайт с кабинетом) и добавить домен в `SITE_ORIGINS`, если копия на GitHub Pages останется.
+Домен poledance-kiseleva.ru смотрит на GitHub Pages: A-записи `@` → 185.199.108–111.153, CNAME `www` → misterharryx.github.io. Заявки и правки по-прежнему идут на Vercel; домен разрешён в `SITE_ORIGINS` (`server/http.ts`).
 
 ## Где что менять в коде
 

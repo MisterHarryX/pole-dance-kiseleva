@@ -50,10 +50,10 @@ export function sameOrigin(request: Request) {
 }
 
 /**
- * Other sites allowed to call the public API from the browser: the static copy on GitHub Pages.
+ * Other sites allowed to call the public API from the browser: the static copy on GitHub Pages (poledance-kiseleva.ru).
  * Extra origins can be added in SITE_ORIGINS, comma-separated. The panel itself never accepts them.
  */
-const SITE_ORIGINS = ['https://misterharryx.github.io'];
+const SITE_ORIGINS = ['https://poledance-kiseleva.ru', 'https://www.poledance-kiseleva.ru', 'https://misterharryx.github.io'];
 
 export function allowedOrigin(request: Request) {
   const origin = request.headers.get('origin');
